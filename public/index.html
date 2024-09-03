@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Title Detector</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Book Title Detector</h1>
+    
+    <label for="imageInput">Upload an image of a book cover:</label>
+    <input type="file" id="imageInput" accept="image/*" title="Choose an image file to detect book titles" placeholder="Upload book cover image">
+    
+    <button onclick="detectBooks()">Detect Books</button>
+
+    <h2>Detected Books</h2>
+    <ul id="bookList"></ul>
+
+    <h2>Bibliographic Information</h2>
+    <table id="bookTable">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Subtitle</th>
+                <th>Authors</th>
+                <th>Publisher</th>
+                <th>Published Date</th>
+                <th>ISBN-13</th>
+                <th>ISBN-10</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script src="script.js"></script>
+</body>
+</html>
