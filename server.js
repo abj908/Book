@@ -8,7 +8,7 @@ console.log("Starting server...");
 const app = express();
 
 // Increase the request body size limit
-app.use(express.json({ limit: '10mb' })); // or larger if needed
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -18,15 +18,13 @@ app.get('/health', (req, res) => {
 });
 
 console.log("Environment Variables Loaded");
-console.log(`OpenAI API Key: ${process.env.OPENAI_API_KEY}`);
-console.log(`Google API Key: ${process.env.GOOGLE_API_KEY}`);
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
 const OpenAI = require('openai');
 
-// Properly initialize the OpenAI API client
+// Initialize the OpenAI API client
 const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
 });
