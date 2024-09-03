@@ -3,9 +3,19 @@ const axios = require('axios');
 const path = require('path');
 require('dotenv').config();
 
+console.log("Starting server...");
+
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/health', (req, res) => {
+    res.send('Server is running.');
+});
+
+console.log("Environment Variables Loaded");
+console.log(`OpenAI API Key: ${process.env.OPENAI_API_KEY}`);
+console.log(`Google API Key: ${process.env.GOOGLE_API_KEY}`);
 
 // Load API keys from environment variables
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
