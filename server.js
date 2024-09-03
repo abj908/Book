@@ -1,7 +1,6 @@
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
-const base64Img = require('base64-img');
 require('dotenv').config();
 
 console.log("Starting server...");
@@ -33,11 +32,18 @@ const openai = new OpenAI({
 // Function to detect books using OpenAI
 async function detectBooks(base64Image) {
     try {
+        // Log the base64-encoded image (for debugging purposes, you may want to log only a part of it)
+        console.log("Base64 Encoded Image (first 100 chars):", base64Image.substring(0, 100));
+
         const response = await openai.completions.create({
-            model: 'gpt-4', // Make sure the correct model is being used
+            model: 'gpt-4', // Ensure you're using the correct model or API endpoint
             prompt: `Return a comma-separated string of the book titles in this picture:\n\n[data:image/jpeg;base64,${base64Image}]`,
             max_tokens: 300,
         });
+
+        // Log the response from OpenAI
+        console.log("OpenAI API Response:", response.data);
+
         const content = response.choices[0].text.trim();
         return content.split(',').map(book => book.trim());
     } catch (error) {
