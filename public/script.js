@@ -21,12 +21,45 @@ function detectBooks() {
             },
             body: JSON.stringify({ base64Image })
         })
-        .then(response => response.json())
+        .then(response => {
+            // Log the response status and headers for debugging
+            console.log('Response Status:', response.status);
+            console.log('Response Headers:', response.headers);
+
+            // Attempt to read the response as text first to handle potential errors
+            return response.text().then(text => {
+                // Log the raw text response
+                console.log('Raw Response:', text);
+
+                // Try to parse the text as JSON if the response was OK
+                if (response.ok) {
+                    try {
+                        return JSON.parse(text);
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                        throw new Error('Invalid JSON response');
+                    }
+                } else {
+                    throw new Error(text);
+                }
+            });
+        })
         .then(data => {
-            displayBooks(data);
+            // Log the parsed data
+            console.log('Parsed Data:', data);
+
+            // Display the books if data is valid
+            if (data && Array.isArray(data)) {
+                displayBooks(data);
+            } else {
+                console.error('Unexpected data format:', data);
+                alert('Failed to detect books. Please try again.');
+            }
         })
         .catch(error => {
+            // Log any errors encountered during the fetch or JSON parsing
             console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
         });
     });
 }
