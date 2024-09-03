@@ -21,32 +21,57 @@ console.log("Environment Variables Loaded");
 console.log(`OpenAI API Key: ${process.env.OPENAI_API_KEY}`);
 console.log(`Google API Key: ${process.env.GOOGLE_API_KEY}`);
 
-// Load API keys from environment variables
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
-// Route to handle book detection and data fetching
+const { Configuration, OpenAIApi } = require('openai');
+const configuration = new Configuration({
+    apiKey: OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+
+// Function to detect books using OpenAI
+async function detectBooks(base64Image) {
+    try {
+        const response = await openai.createCompletion({
+            model: 'gpt-4', // Ensure you're using the correct model or API endpoint
+            prompt: `Return a comma separated string of the book titles in this picture:\n\n[data:image/jpeg;base64,${base64Image}]`,
+            max_tokens: 300,
+        });
+        const content = response.data.choices[0].text.trim();
+        return content.split(',').map(book => book.trim());
+    } catch (error) {
+        console.error('Error detecting books:', error);
+        throw new Error('Failed to detect books');
+    }
+}
+
+// Function to fetch bibliographic data from Google Books API
+async function fetchBookData(book) {
+    try {
+        const response = await axios.get(
+            `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(book)}&key=${GOOGLE_API_KEY}`
+        );
+        return response.data.items[0].volumeInfo;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw new Error('Failed to fetch book data');
+    }
+}
+
 app.post('/detect-books', async (req, res) => {
     const { base64Image } = req.body;
 
-    // Simulated response from OpenAI API
-    const detectedBooks = ["Anna Karenina", "Moby Dick"];
+    try {
+        const detectedBooks = await detectBooks(base64Image);
+        const bookDataPromises = detectedBooks.map(fetchBookData);
+        const bookData = await Promise.all(bookDataPromises);
 
-    // Fetch bibliographic information for detected books
-    const bookData = [];
-    for (const book of detectedBooks) {
-        try {
-            const response = await axios.get(
-                `https://www.googleapis.com/books/v1/volumes?q=${book}&key=${GOOGLE_API_KEY}`
-            );
-            bookData.push(response.data.items[0].volumeInfo);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            return res.status(500).json({ error: 'Failed to fetch book data.' });
-        }
+        res.json(bookData);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: error.message });
     }
-
-    res.json(bookData);
 });
 
 // Start the server
