@@ -29,22 +29,30 @@ const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
 });
 
-// Function to detect books using OpenAI
+// Function to detect books using OpenAI with image input
 async function detectBooks(base64Image) {
     try {
-        // Log the base64-encoded image (for debugging purposes, you may want to log only a part of it)
-        console.log("Base64 Encoded Image (first 100 chars):", base64Image.substring(0, 100));
-
-        const response = await openai.completions.create({
-            model: 'gpt-4', // Ensure you're using the correct model or API endpoint
-            prompt: `Return a comma-separated string of the book titles in this picture:\n\n[data:image/jpeg;base64,${base64Image}]`,
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4o', // Updated to use the correct model for image input
+            messages: [
+                {
+                    role: 'user',
+                    content: [
+                        { type: 'text', text: 'Return a comma-separated string of the book titles in this picture' },
+                        {
+                            type: 'image_url',
+                            image_url: { url: `data:image/jpeg;base64,${base64Image}` },
+                        },
+                    ],
+                },
+            ],
             max_tokens: 300,
         });
 
         // Log the response from OpenAI
-        console.log("OpenAI API Response:", response.data);
+        console.log("OpenAI API Response:", response);
 
-        const content = response.choices[0].text.trim();
+        const content = response.choices[0].message.content.trim();
         return content.split(',').map(book => book.trim());
     } catch (error) {
         console.error('Error detecting books:', error);
