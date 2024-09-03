@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
-const base64Img = require('base64-img'); // Import base64-img package
+const base64Img = require('base64-img');
 require('dotenv').config();
 
 console.log("Starting server...");
@@ -9,7 +9,7 @@ console.log("Starting server...");
 const app = express();
 
 // Increase the request body size limit
-app.use(express.json({ limit: '10mb' })); // or larger if needed
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -30,11 +30,11 @@ const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
 });
 
-// Function to detect books using OpenAI with base64 encoded image
+// Function to detect books using OpenAI
 async function detectBooks(base64Image) {
     try {
         const response = await openai.completions.create({
-            model: 'gpt-4', // Ensure you're using the correct model or API endpoint
+            model: 'gpt-4', // Make sure the correct model is being used
             prompt: `Return a comma-separated string of the book titles in this picture:\n\n[data:image/jpeg;base64,${base64Image}]`,
             max_tokens: 300,
         });
@@ -63,8 +63,6 @@ app.post('/detect-books', async (req, res) => {
     const { base64Image } = req.body;
 
     try {
-        // Convert the base64 image to a file (if necessary)
-        // In this case, we're directly passing the base64 string as it's expected by the API
         const detectedBooks = await detectBooks(base64Image);
         const bookDataPromises = detectedBooks.map(fetchBookData);
         const bookData = await Promise.all(bookDataPromises);
