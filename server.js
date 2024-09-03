@@ -6,7 +6,11 @@ require('dotenv').config();
 console.log("Starting server...");
 
 const app = express();
-app.use(express.json());
+
+// Increase the request body size limit
+app.use(express.json({ limit: '10mb' })); // or larger if needed
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/health', (req, res) => {
