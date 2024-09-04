@@ -15,7 +15,7 @@ const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
 // --- Add Google Auth middleware ---
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'defaultSecret',
     resave: false,
     saveUninitialized: true,
 }));
@@ -62,12 +62,17 @@ app.get('/auth/callback',
 );
 
 app.get('/logout', (req, res) => {
-    req.logout(() => {
+    req.logout((err) => {
+        if (err) return next(err);
         res.redirect('/');
     });
 });
 
 // Check if user is authenticated middleware
+app.get('/auth/status', (req, res) => {
+    res.json({ isAuthenticated: req.isAuthenticated() });
+});
+
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();

@@ -24,8 +24,19 @@ function detectBooks() {
             },
             body: JSON.stringify({ base64Image }),
         })
-        .then(response => response.json())
-        .then(data => displayBooks(data))
+        .then(response => {
+            if (response.redirected) {
+                // Redirect the user to Google login if not authenticated
+                window.location.href = response.url;
+            } else {
+                return response.json();
+            }
+        })
+        .then(data => {
+            if (data) {
+                displayBooks(data);
+            }
+        })
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred: ' + error.message);
