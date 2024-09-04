@@ -11,8 +11,7 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-app.use(express.static(path.join(__dirname, 'public')));
-
+// Health check route
 app.get('/health', (req, res) => {
     res.send('Server is running.');
 });
@@ -73,21 +72,31 @@ async function fetchBookData(book) {
     }
 }
 
+// POST route to detect books
 app.post('/detect-books', async (req, res) => {
     console.log('Route /detect-books was hit');
     const { base64Image } = req.body;
 
     try {
+        // For now, return mock data to test if the route works
+        res.json([{ title: 'Mock Book 1' }, { title: 'Mock Book 2' }]);
+
+        // Uncomment the following lines once you verify the route works
+        /*
         const detectedBooks = await detectBooks(base64Image);
         const bookDataPromises = detectedBooks.map(fetchBookData);
         const bookData = await Promise.all(bookDataPromises);
 
         res.json(bookData);
+        */
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: error.message });
     }
 });
+
+// Serve static files after routes
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Start the server
 const PORT = process.env.PORT || 3000;
