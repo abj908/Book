@@ -9,30 +9,76 @@
 <body>
     <h1>Book Detection and Citation Generator</h1>
     
-    <label for="imageInput">Upload an image of your library:</label>
-    <input type="file" id="imageInput" accept="image/*" title="Choose an image file to detect books" placeholder="Upload library">
+    <!-- Google Login/Logout Section -->
+    <div id="authSection">
+        <!-- This content will be dynamically modified based on user authentication -->
+        <button id="loginButton" style="display: none;" onclick="login()">Login with Google</button>
+        <button id="logoutButton" style="display: none;" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- File upload and detect books button (will be hidden if not authenticated) -->
+    <div id="mainContent" style="display: none;">
+        <label for="imageInput">Upload an image of your library:</label>
+        <input type="file" id="imageInput" accept="image/*" title="Choose an image file to detect books" placeholder="Upload library">
     
-    <button onclick="detectBooks()">Detect Books</button>
+        <button onclick="detectBooks()">Detect Books</button>
 
-    <h2>Detected Books</h2>
-    <ul id="bookList"></ul>
+        <h2>Detected Books</h2>
+        <ul id="bookList"></ul>
 
-    <h2>Bibliographic Information</h2>
-    <table id="bookTable">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Subtitle</th>
-                <th>Authors</th>
-                <th>Publisher</th>
-                <th>Published Date</th>
-                <th>ISBN-13</th>
-                <th>ISBN-10</th>
-                <th>Link</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+        <h2>Bibliographic Information</h2>
+        <table id="bookTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Subtitle</th>
+                    <th>Authors</th>
+                    <th>Publisher</th>
+                    <th>Published Date</th>
+                    <th>ISBN-13</th>
+                    <th>ISBN-10</th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Function to determine if the user is authenticated
+        function checkAuthStatus() {
+            fetch('/auth/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.isAuthenticated) {
+                    document.getElementById('loginButton').style.display = 'none';
+                    document.getElementById('logoutButton').style.display = 'block';
+                    document.getElementById('mainContent').style.display = 'block';
+                } else {
+                    document.getElementById('loginButton').style.display = 'block';
+                    document.getElementById('logoutButton').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking auth status:', error);
+            });
+        }
+
+        // Function to handle login
+        function login() {
+            window.location.href = '/auth/google'; // Redirects to Google OAuth login
+        }
+
+        // Function to handle logout
+        function logout() {
+            window.location.href = '/logout'; // Redirects to the server logout route
+        }
+
+        // Check authentication status on page load
+        window.onload = checkAuthStatus;
+    </script>
+
     <script src="script.js"></script>
 </body>
 </html>
