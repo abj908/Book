@@ -5,8 +5,8 @@ const axios = require('axios');
 const path = require('path');
 
 const app = express();
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;

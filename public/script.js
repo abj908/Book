@@ -24,8 +24,18 @@ function detectBooks() {
             },
             body: JSON.stringify({ base64Image }),
         })
-        .then(response => response.json())
-        .then(data => displayBooks(data))
+        .then(response => {
+            // Check if the server response is JSON
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json(); // Parse JSON response
+            } else {
+                return response.text().then(text => {
+                    throw new Error(`Server error: ${text}`);
+                });
+            }
+        })
+        .then(data => displayBooks(data)) // Assuming displayBooks works with JSON data
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred: ' + error.message);
