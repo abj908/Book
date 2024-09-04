@@ -74,6 +74,7 @@ async function fetchBookData(book) {
 }
 
 app.post('/detect-books', async (req, res) => {
+    console.log('Route /detect-books was hit');
     const { base64Image } = req.body;
 
     try {
