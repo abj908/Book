@@ -14,7 +14,7 @@ function detectBooks() {
     }
 
     encodeImageToBase64(imageInput, (base64Image) => {
-        fetch('http://localhost:3000/detect-books', {
+        fetch('http://52.90.190.122:3000/detect-books', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
