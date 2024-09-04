@@ -35,7 +35,13 @@ function detectBooks() {
                 });
             }
         })
-        .then(data => displayBooks(data)) // Assuming displayBooks works with JSON data
+        .then(data => {
+            // Ensure the response data is an array
+            if (!Array.isArray(data)) {
+                throw new Error('Expected an array of books but got something else.');
+            }
+            displayBooks(data); // Call displayBooks only if data is valid
+        })
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred: ' + error.message);
@@ -44,18 +50,38 @@ function detectBooks() {
 }
 
 // Function to display the detected books
+// Function to display the detected books
 function displayBooks(books) {
+    // Ensure books is an array before proceeding
+    if (!Array.isArray(books)) {
+        console.error('Expected an array but received:', books);
+        alert('Failed to load book data. Please try again.');
+        return;
+    }
+
     const bookList = document.getElementById('bookList');
     const bookTableBody = document.querySelector("#bookTable tbody");
 
+    // Clear previous results
     bookList.innerHTML = '';
     bookTableBody.innerHTML = '';
 
+    // If there are no books, notify the user
+    if (books.length === 0) {
+        const emptyMessage = document.createElement('li');
+        emptyMessage.textContent = 'No books detected.';
+        bookList.appendChild(emptyMessage);
+        return;
+    }
+
+    // Loop through the detected books and display them in both the list and table
     books.forEach(book => {
+        // Create and append a list item
         const li = document.createElement('li');
-        li.textContent = book.title;
+        li.textContent = book.title || "No Title";
         bookList.appendChild(li);
 
+        // Create and append a row for the table
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${book.title || "No Title"}</td>
