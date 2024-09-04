@@ -1,4 +1,6 @@
-const baseApiUrl = location.hostname === 'localhost' ? 'http://52.90.190.122:3000' : '/api';
+const baseApiUrl = location.hostname === 'localhost' || location.hostname === '127.0.0.1' 
+    ? 'http://52.90.190.122:3000' 
+    : `http://${location.hostname}:3000`;
 
 // Function to encode the uploaded image to base64
 function encodeImageToBase64(imageFile, callback) {
