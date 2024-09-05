@@ -6,6 +6,7 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Detect books from the base64 image
 async function detectBooks(base64Image) {
     try {
         const response = await openai.chat.completions.create({
@@ -27,33 +28,32 @@ async function detectBooks(base64Image) {
         const content = response.choices[0].message.content.trim();
         return content.split(',').map(book => book.trim());
     } catch (error) {
-        throw new Error('Failed to detect books');
+        console.error('Error detecting books:', error.message);
+        throw new Error('Failed to detect books. Please try again later.');
     }
 }
 
+// Fetch book data from Google Books API
 async function fetchBookData(book) {
     try {
         const response = await axios.get(
             `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(book)}&key=${process.env.GOOGLE_API_KEY}`
         );
+        if (!response.data.items || !response.data.items[0]) {
+            throw new Error(`No data found for book: ${book}`);
+        }
         return response.data.items[0].volumeInfo;
     } catch (error) {
-        throw new Error('Failed to fetch book data');
+        console.error(`Error fetching data for book "${book}":`, error.message);
+        throw new Error(`Failed to fetch data for book: ${book}`);
     }
 }
 
-module.exports = async (req, res) => {
-    if (req.method === 'POST') {
-        const { base64Image } = req.body;
-        try {
-            const detectedBooks = await detectBooks(base64Image);
-            const bookDataPromises = detectedBooks.map(fetchBookData);
-            const bookData = await Promise.all(bookDataPromises);
-            res.status(200).json(bookData);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    } else {
-        res.status(405).json({ error: 'Method not allowed' });
+// Validate the request body
+function validateRequestBody(body) {
+    if (!body || !body.base64Image) {
+        throw new Error('Invalid request: base64Image is required');
     }
-};
+}
+
+module.exports = { detectBooks, fetchBookData, validateRequestBody };

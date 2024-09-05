@@ -50,7 +50,6 @@ function detectBooks() {
 }
 
 // Function to display the detected books
-// Function to display the detected books
 function displayBooks(books) {
     // Ensure books is an array before proceeding
     if (!Array.isArray(books)) {
